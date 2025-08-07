@@ -25,11 +25,11 @@ int main() {
   signal(SIGINT, ctrlc_handler);
 
   ///  Create a communication channel instance
-  IChannel* _channel;
-  Result<IChannel*> channel = createSerialPortChannel("/dev/ttyUSB0", 115200);
+  IChannel *_channel;
+  Result<IChannel *> channel = createSerialPortChannel("/dev/ttyUSB0", 115200);
 
   ///  Create a LIDAR driver instance
-  ILidarDriver* lidar = *createLidarDriver();
+  ILidarDriver *lidar = *createLidarDriver();
   auto res = (*lidar).connect(*channel);
   if (SL_IS_OK(res)) {
     sl_lidar_response_device_info_t deviceInfo;
@@ -63,7 +63,7 @@ int main() {
   while (!ctrl_c_pressed) {
     int loop_count = 0;
 
-    for (auto& v : near) {
+    for (auto &v : near) {
       v = std::numeric_limits<float>::infinity();
     }
 

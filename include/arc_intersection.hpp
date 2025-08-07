@@ -4,8 +4,9 @@
 
 // 中心(x, y), 半径r, 角度範囲[angle_min, angle_max]（度）
 // 交点は2つ返す: (交点1, 交点2)
-std::pair<cv::Point2f, cv::Point2f> intersection_points_from_arc(
-    float x, float y, float r, float angle_min, float angle_max) {
+std::pair<cv::Point2f, cv::Point2f>
+intersection_points_from_arc(float x, float y, float r, float angle_min,
+                             float angle_max) {
   if (angle_min > angle_max) {
     std::swap(angle_min, angle_max);
   }
@@ -44,7 +45,8 @@ std::pair<cv::Point2f, cv::Point2f> intersection_points_from_arc(
     // p1 + t1*d1 = p2 + t2*d2
     float a = d1.x, b = -d2.x, c = d1.y, d = -d2.y;
     float det = a * d - b * c;
-    if (std::abs(det) < 1e-6) return cv::Point2f(NAN, NAN);  // 平行
+    if (std::abs(det) < 1e-6)
+      return cv::Point2f(NAN, NAN); // 平行
     float dx = p2.x - p1.x, dy = p2.y - p1.y;
     float t1 = (dx * d - b * dy) / det;
     return cv::Point2f(p1.x + t1 * d1.x, p1.y + t1 * d1.y);
