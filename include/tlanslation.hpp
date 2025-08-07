@@ -1,0 +1,6 @@
+#include <opencv2/opencv.hpp>
+
+cv::Point2f degree2position(int x, int y, float angle, float distance) {
+  float radian = angle * CV_PI / 180.0f;
+  return cv::Point2f(x + distance * cos(radian), y + distance * sin(radian));
+}
