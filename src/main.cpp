@@ -2,13 +2,18 @@
 #include <signal.h>
 
 #include <iostream>
+#include <limits>
 #include <vector>
 
+#include "arc_intersection.hpp"
+#include "degree2position.hpp"
 using namespace sl;
 
 #ifndef _countof
 #define _countof(_Array) (int)(sizeof(_Array) / sizeof(_Array[0]))
 #endif
+
+constexpr int IMG_SIZE = 600;
 
 volatile sig_atomic_t ctrl_c_pressed = 0;
 
@@ -67,6 +72,7 @@ int main() {
 
     sl_result op_result = lidar->grabScanDataHq(nodes, count);
 
+    cv::Mat img = cv::Mat::zeros(IMG_SIZE, IMG_SIZE, CV_8UC3);
     if (SL_IS_OK(op_result)) {
       lidar->ascendScanData(nodes, count);
 
@@ -75,30 +81,44 @@ int main() {
             47) {
           continue;
         }
-        float angle = (nodes[pos].angle_z_q14 * 90.f) / 16384.f;
+        float degree = (nodes[pos].angle_z_q14 * 90.f) / 16384.f;
         float dist = nodes[pos].dist_mm_q2 / 4.0f;
 
-        loop_count += (angle > (loop_count + 1) * angle_step);
+        loop_count += (degree > (loop_count + 1) * angle_step);
 
         near[loop_count] = std::min(near[loop_count], dist);
 
-        //   printf("%i ", pos);
-        //   printf("%s theta: %03.2f Dist: %08.2f Q: %d \n",
-        //          (nodes[pos].flag & SL_LIDAR_RESP_HQ_FLAG_SYNCBIT) ? "S " : "
-        //          ", (nodes[pos].angle_z_q14 * 90.f) / 16384.f,
-        //          nodes[pos].dist_mm_q2 / 4.0f,
-        //          nodes[pos].quality >>
-        //          SL_LIDAR_RESP_MEASUREMENT_QUALITY_SHIFT);
+        cv::drawMarker(img,
+                       degree2position(IMG_SIZE / 2, IMG_SIZE / 2, degree,
+                                       std::min(dist, IMG_SIZE / 2.0f)),
+                       cv::Scalar(255, 0, 0), cv::MARKER_CROSS, 10, 2);
       }
       std::cout << near[0] << " " << near[1] << " " << near[2] << " " << near[3]
                 << std::endl;
+    }
+
+    cv::Scalar colors[4] = {cv::Scalar(0, 255, 0), cv::Scalar(0, 0, 255),
+                            cv::Scalar(255, 0, 0), cv::Scalar(255, 255, 0)};
+
+    for (auto i = 0; i < div; ++i) {
+      // auto [st, fin] = intersection_points_from_arc(
+      //     IMG_SIZE / 2, IMG_SIZE / 2, std::min(near[i], IMG_SIZE / 2.0f),
+      //     360.0f / div * i, 360.0f / div * (i + 1));
+      // cv::line(img, st, fin, cv::Scalar(0, 255, 0), 2);
+      near[i] = std::min(near[i], IMG_SIZE / 2.0f);
+
+      cv::ellipse(img, cv::Point2d(IMG_SIZE / 2, IMG_SIZE / 2),
+                  cv::Size(near[i], near[i]), 360.0f / div,
+                  360.0f / div * (i - 1), 360.0f / div * i, colors[i], 2);
+    }
+    cv::imshow("Test Window", img);
+    if (cv::waitKey(1) == 'q') {
+      break;
     }
   }
 
   lidar->stop();
   lidar->setMotorSpeed(0);
 
-  // cv::imshow("Test Window", cv::Mat::zeros(300, 300, CV_8UC3));
-  // cv::waitKey(0);
   return 0;
 }
