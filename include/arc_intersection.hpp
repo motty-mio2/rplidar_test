@@ -6,6 +6,15 @@
 // 交点は2つ返す: (交点1, 交点2)
 std::pair<cv::Point2f, cv::Point2f> intersection_points_from_arc(
     float x, float y, float r, float angle_min, float angle_max) {
+  if (angle_min > angle_max) {
+    std::swap(angle_min, angle_max);
+  }
+
+  if (angle_max - angle_min >= 180) {
+    // 角度範囲が180度以上の場合、交点は無限に存在するため、特別な処理を行う
+    return std::make_pair(cv::Point2f(NAN, NAN), cv::Point2f(NAN, NAN));
+  }
+
   // 角度範囲の中心
   float angle_center = (angle_min + angle_max) / 2.0f;
   float rad_center = angle_center * CV_PI / 180.0f;
