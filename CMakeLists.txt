@@ -1,3 +1,23 @@
+
+
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  URL https://github.com/google/googletest/archive/refs/heads/main.zip
+)
+FetchContent_MakeAvailable(googletest)
+
+enable_testing()
+
+#テスト用ターゲット
+file(GLOB TEST_SOURCES test/*.cpp)
+foreach(test_src ${TEST_SOURCES})
+  get_filename_component(test_name ${test_src} NAME_WE)
+  add_executable(${test_name} ${test_src})
+  target_include_directories(${test_name} PRIVATE include)
+  target_link_libraries(${test_name} ${OpenCV_LIBS} gtest gtest_main)
+  add_test(NAME ${test_name} COMMAND ${test_name})
+endforeach()
 cmake_minimum_required(VERSION 3.10)
 project(rplidar_test)
 
@@ -13,6 +33,7 @@ include_directories(3rdparty/rplidar_sdk/sdk/src/arch/linux)
 
 find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
+target_include_directories(${test_name} PRIVATE include)
 
 
 # rplidar SDK sources
