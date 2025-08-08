@@ -35,6 +35,8 @@ find_package(OpenCV REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 target_include_directories(${test_name} PRIVATE include)
 
+find_package (gflags REQUIRED)
+include_directories (${gflags_INCLUDE_DIR})
 
 # rplidar SDK sources
 file(GLOB RPLIDAR_SDK_SRC
@@ -46,4 +48,4 @@ file(GLOB RPLIDAR_SDK_SRC
 )
 
 add_executable(hello src/main.cpp ${RPLIDAR_SDK_SRC})
-target_link_libraries(hello ${OpenCV_LIBS} pthread)
+target_link_libraries(hello ${OpenCV_LIBS} pthread gflags)

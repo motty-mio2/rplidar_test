@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ARC_INTERSECTION_HPP
+#define ARC_INTERSECTION_HPP
+
 #include <cmath>
 #include <opencv2/opencv.hpp>
 
@@ -66,3 +68,5 @@ intersection_points_from_arc(float x, float y, float r, float angle_min,
 
   return std::make_pair(cross1, cross2);
 }
+
+#endif // ARC_INTERSECTION_HPP

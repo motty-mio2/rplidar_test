@@ -7,6 +7,9 @@
 
 #include "arc_intersection.hpp"
 #include "degree2position.hpp"
+#include "flags.hpp"
+#include "generate_color.hpp"
+
 using namespace sl;
 
 #ifndef _countof
@@ -19,14 +22,15 @@ volatile sig_atomic_t ctrl_c_pressed = 0;
 
 void ctrlc_handler(int) { ctrl_c_pressed = 1; }
 
-int main() {
+int main(int argc, char *argv[]) {
+  gflags::ParseCommandLineFlags(&argc, &argv, true);
   std::cout << "Hello, RPLIDAR!" << std::endl;
 
   signal(SIGINT, ctrlc_handler);
 
   ///  Create a communication channel instance
   IChannel *_channel;
-  Result<IChannel *> channel = createSerialPortChannel("/dev/ttyUSB0", 115200);
+  Result<IChannel *> channel = createSerialPortChannel(FLAGS_d, 115200);
 
   ///  Create a LIDAR driver instance
   ILidarDriver *lidar = *createLidarDriver();
@@ -52,7 +56,7 @@ int main() {
 
   // fetech result and print it out...
 
-  int div = 4;
+  uint32_t div = FLAGS_num;
   float angle_step = 360.0f / div;
   std::vector<float> near;
 
@@ -82,34 +86,29 @@ int main() {
           continue;
         }
         float degree = (nodes[pos].angle_z_q14 * 90.f) / 16384.f;
-        float dist = nodes[pos].dist_mm_q2 / 4.0f;
+        float dist =
+            std::min(FLAGS_max_dist, (double)nodes[pos].dist_mm_q2 / 4.0f) *
+            (IMG_SIZE / 2.0f) / FLAGS_max_dist;
 
         loop_count += (degree > (loop_count + 1) * angle_step);
 
         near[loop_count] = std::min(near[loop_count], dist);
 
-        cv::drawMarker(img,
-                       degree2position(IMG_SIZE / 2, IMG_SIZE / 2, degree,
-                                       std::min(dist, IMG_SIZE / 2.0f)),
-                       cv::Scalar(255, 0, 0), cv::MARKER_CROSS, 10, 2);
+        cv::drawMarker(
+            img, degree2position(IMG_SIZE / 2, IMG_SIZE / 2, degree, dist),
+            //  std::min(dist, IMG_SIZE / 2.0f)),
+            cv::Scalar(255, 0, 0), cv::MARKER_CROSS, 10, 2);
       }
       std::cout << near[0] << " " << near[1] << " " << near[2] << " " << near[3]
                 << std::endl;
     }
 
-    cv::Scalar colors[4] = {cv::Scalar(0, 255, 0), cv::Scalar(0, 0, 255),
-                            cv::Scalar(255, 0, 0), cv::Scalar(255, 255, 0)};
-
     for (auto i = 0; i < div; ++i) {
-      // auto [st, fin] = intersection_points_from_arc(
-      //     IMG_SIZE / 2, IMG_SIZE / 2, std::min(near[i], IMG_SIZE / 2.0f),
-      //     360.0f / div * i, 360.0f / div * (i + 1));
-      // cv::line(img, st, fin, cv::Scalar(0, 255, 0), 2);
       near[i] = std::min(near[i], IMG_SIZE / 2.0f);
 
       cv::ellipse(img, cv::Point2d(IMG_SIZE / 2, IMG_SIZE / 2),
-                  cv::Size(near[i], near[i]), 360.0f / div,
-                  360.0f / div * (i - 1), 360.0f / div * i, colors[i], 2);
+                  cv::Size(near[i], near[i]), angle_step, angle_step * (i - 1),
+                  angle_step * i, generate_color(i, DE), 2);
     }
     cv::imshow("Test Window", img);
     if (cv::waitKey(1) == 'q') {
