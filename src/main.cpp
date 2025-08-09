@@ -56,11 +56,10 @@ int main(int argc, char *argv[]) {
 
   // fetech result and print it out...
 
-  uint32_t div = FLAGS_num;
-  float angle_step = 360.0f / div;
+  float angle_step = 360.0f / FLAGS_num;
   std::vector<float> near;
 
-  for (auto i = 0; i < div; ++i) {
+  for (auto i = 0; i < FLAGS_num; ++i) {
     near.push_back(std::numeric_limits<float>::infinity());
   }
 
@@ -103,12 +102,12 @@ int main(int argc, char *argv[]) {
                 << std::endl;
     }
 
-    for (auto i = 0; i < div; ++i) {
+    for (auto i = 0; i < FLAGS_num; ++i) {
       near[i] = std::min(near[i], IMG_SIZE / 2.0f);
 
       cv::ellipse(img, cv::Point2d(IMG_SIZE / 2, IMG_SIZE / 2),
                   cv::Size(near[i], near[i]), angle_step, angle_step * (i - 1),
-                  angle_step * i, generate_color(i), 2);
+                  angle_step * i, generate_color(i, FLAGS_num), 2);
     }
     cv::imshow("Test Window", img);
     if (cv::waitKey(1) == 'q') {
