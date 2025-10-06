@@ -1,5 +1,11 @@
+cmake_minimum_required(VERSION 3.10)
+project(rplidar_test)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
+include_directories(include)
 
+# GoolgeTest
 include(FetchContent)
 FetchContent_Declare(
   googletest
@@ -18,25 +24,23 @@ foreach(test_src ${TEST_SOURCES})
   target_link_libraries(${test_name} ${OpenCV_LIBS} gtest gtest_main)
   add_test(NAME ${test_name} COMMAND ${test_name})
 endforeach()
-cmake_minimum_required(VERSION 3.10)
-project(rplidar_test)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
+target_include_directories(${test_name} PRIVATE include)
 
-include_directories(include)
 # rplidar SDK include
 include_directories(3rdparty/rplidar_sdk/sdk/include)
 include_directories(3rdparty/rplidar_sdk/sdk/src)
 include_directories(3rdparty/rplidar_sdk/sdk/src/hal)
 include_directories(3rdparty/rplidar_sdk/sdk/src/arch/linux)
 
-find_package(OpenCV REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIRS})
-target_include_directories(${test_name} PRIVATE include)
-
+# Third party libraries
 find_package (gflags REQUIRED)
+find_package(OpenCV REQUIRED)
+find_package(zenohc REQUIRED)
+find_package(zenohcxx REQUIRED)
+
 include_directories (${gflags_INCLUDE_DIR})
+include_directories(${OpenCV_INCLUDE_DIRS})
 
 # rplidar SDK sources
 file(GLOB RPLIDAR_SDK_SRC
@@ -47,5 +51,12 @@ file(GLOB RPLIDAR_SDK_SRC
     3rdparty/rplidar_sdk/sdk/src/hal/thread.cpp
 )
 
-add_executable(hello src/main.cpp ${RPLIDAR_SDK_SRC})
-target_link_libraries(hello ${OpenCV_LIBS} pthread gflags)
+file(GLOB LIDAR_TEST_SRC
+  src/main.cpp
+  src/lidar_obj.cpp
+  src/zenoh_wrapper.cpp
+)
+
+add_executable(hello ${LIDAR_TEST_SRC} ${RPLIDAR_SDK_SRC})
+target_link_libraries(hello ${OpenCV_LIBS} pthread gflags zenohcxx::zenohc )
+
