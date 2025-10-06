@@ -4,16 +4,17 @@
 #include <map>
 #include <string>
 
+using lidar_data_t = std::map<float, float>;
+
 class LiDAR_DATA {
 private:
-  std::map<int, float> data;
+  lidar_data_t data;
 
 public:
-  LiDAR_DATA();
-
-  void insert(int index, float value);
+  void insert(float degree, float value);
   void to_string(std::string &out);
   void clear();
+  lidar_data_t get();
 };
 
 #endif // LIDAR_TYPE_HPP_

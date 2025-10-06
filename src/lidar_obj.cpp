@@ -1,7 +1,9 @@
 
 #include <lidar_obj.hpp>
 
-void LiDAR_DATA::insert(int index, float value) { data[index] = value; }
+void LiDAR_DATA::insert(float degree, float value) { //
+  data[degree] = value;
+}
 
 void LiDAR_DATA::to_string(std::string &out) {
   out = "{";
@@ -11,4 +13,10 @@ void LiDAR_DATA::to_string(std::string &out) {
   out += "}";
 }
 
-void LiDAR_DATA::clear() { data.clear(); }
+void LiDAR_DATA::clear() { //
+  data.clear();
+}
+
+lidar_data_t LiDAR_DATA::get() { //
+  return data;
+}
