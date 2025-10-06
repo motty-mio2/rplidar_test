@@ -19,10 +19,10 @@ constexpr int IMG_SIZE = 600;
 void visualize(lidar_data_t data) {
   float angle_step = 360.0f / FLAGS_num;
 
-  std::vector<float> near;
+  std::vector<double> near;
 
   for (auto i = 0; i < FLAGS_num; ++i) {
-    near.push_back(std::numeric_limits<float>::infinity());
+    near.push_back(IMG_SIZE / 2.0f);
   }
 
   cv::Mat img = cv::Mat::zeros(IMG_SIZE, IMG_SIZE, CV_8UC3);
@@ -34,14 +34,11 @@ void visualize(lidar_data_t data) {
 
     int index = static_cast<int>(degree / angle_step);
 
-    near[index] = std::min((double)near[index],
-                           distance * (IMG_SIZE / 2.0f) / FLAGS_max_dist);
+    near[index] =
+        std::min(near[index], distance * (IMG_SIZE / 2.0f) / FLAGS_max_dist);
   }
 
   for (auto i = 0; i < FLAGS_num; ++i) {
-    near[i] = std::min(near[i] * IMG_SIZE / 2.0f / FLAGS_max_dist,
-                       (double)IMG_SIZE / 2.0f);
-
     cv::ellipse(img, cv::Point2d(IMG_SIZE / 2, IMG_SIZE / 2),
                 cv::Size(near[i], near[i]), angle_step, angle_step * (i - 1),
                 angle_step * i, generate_color(i, FLAGS_num), 2);
@@ -54,4 +51,4 @@ void visualize(lidar_data_t data) {
   }
 }
 
-#endif  // VISUALIZER_HPP_
+#endif // VISUALIZER_HPP_

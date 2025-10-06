@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
         }
 
         float degree = (nodes[pos].angle_z_q14 * 90.f) / 16384.f;
-        float dist = std::min(FLAGS_max_dist,  //
+        float dist = std::min(FLAGS_max_dist, //
                               (double)nodes[pos].dist_mm_q2 / 4.0f);
 
         data.insert(degree, dist);
