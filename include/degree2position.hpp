@@ -8,4 +8,4 @@ cv::Point2f degree2position(int x, int y, float angle, float distance) {
   return cv::Point2f(x + distance * cos(radian), y + distance * sin(radian));
 }
 
-#endif // DEGREE2POSITION_HPP
+#endif  // DEGREE2POSITION_HPP

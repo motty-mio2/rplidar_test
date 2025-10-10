@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
 
     sl_result op_result = lidar->grabScanDataHq(nodes, count);
 
-    auto data = LiDAR_DATA_WRAPPER();
+    auto data = LiDARDataWrapper();
 
     if (SL_IS_OK(op_result)) {
       lidar->ascendScanData(nodes, count);
