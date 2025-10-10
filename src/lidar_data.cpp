@@ -1,6 +1,6 @@
-#include <lidar_obj.hpp>
+#include <lidar_data.hpp>
 
-void to_json(nlohmann::json j, const lidar_metadata &t) {
+void to_json(nlohmann::json j, const LidarMetadata &t) {
   j = nlohmann::json{{"x", t.x},
                      {"y", t.y},
                      {"min_rad", t.min_rad},
@@ -8,7 +8,7 @@ void to_json(nlohmann::json j, const lidar_metadata &t) {
                      {"max_dist", t.max_dist}};
 }
 
-void from_json(const nlohmann::json &j, lidar_metadata &t) {
+void from_json(const nlohmann::json &j, LidarMetadata &t) {
   j.at("x").get_to(t.x);
   j.at("y").get_to(t.y);
   j.at("min_rad").get_to(t.min_rad);

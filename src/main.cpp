@@ -7,7 +7,7 @@
 #include "arc_intersection.hpp"
 #include "degree2position.hpp"
 #include "flags.hpp"
-#include "lidar_obj.hpp"
+#include "lidar_data.hpp"
 #include "visualizer.hpp"
 #include "zenoh_wrapper.hpp"
 using namespace sl;

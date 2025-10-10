@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "generate_color.hpp"
-#include "lidar_obj.hpp"
+#include "lidar_data.hpp"
 
 DECLARE_string(d);
 DECLARE_uint32(num);
