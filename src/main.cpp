@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
 
     sl_result op_result = lidar->grabScanDataHq(nodes, count);
 
-    auto data = LiDAR_DATA();
+    auto data = LiDAR_DATA_WRAPPER();
 
     if (SL_IS_OK(op_result)) {
       lidar->ascendScanData(nodes, count);
@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
         }
 
         float degree = (nodes[pos].angle_z_q14 * 90.f) / 16384.f;
-        float dist = std::min(FLAGS_max_dist, //
+        float dist = std::min(FLAGS_max_dist,  //
                               (double)nodes[pos].dist_mm_q2 / 4.0f);
 
         data.insert(degree, dist);

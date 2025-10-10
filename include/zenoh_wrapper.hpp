@@ -8,13 +8,14 @@
 #include "zenoh.hxx"
 
 class ZenohWrapper {
-private:
+ private:
   std::unique_ptr<zenoh::Session> session;
   std::unique_ptr<zenoh::Publisher> publisher;
 
-public:
+ public:
   ZenohWrapper();
   void publish(std::string data);
+  void publish(std::vector<uint8_t> data);
 };
 
-#endif // PUBLISHER_HPP_
+#endif  // PUBLISHER_HPP_

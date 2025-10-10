@@ -11,3 +11,7 @@ ZenohWrapper::ZenohWrapper() {
 void ZenohWrapper::publish(std::string data) {
   publisher->put(zenoh::Bytes(data));
 }
+
+void ZenohWrapper::publish(std::vector<uint8_t> data) {
+  publisher->put(zenoh::Bytes(data));
+}

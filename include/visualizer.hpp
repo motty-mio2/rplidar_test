@@ -16,7 +16,7 @@ DECLARE_double(max_dist);
 
 constexpr int IMG_SIZE = 600;
 
-void visualize(lidar_data_t data) {
+void visualize(sensor_data_t data) {
   float angle_step = 360.0f / FLAGS_num;
 
   std::vector<double> near;
@@ -51,4 +51,4 @@ void visualize(lidar_data_t data) {
   }
 }
 
-#endif // VISUALIZER_HPP_
+#endif  // VISUALIZER_HPP_
