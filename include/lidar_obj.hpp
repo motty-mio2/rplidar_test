@@ -6,6 +6,14 @@
 
 using lidar_data_t = std::map<float, float>;
 
+struct metadata_t {
+  int x;
+  int y;
+  int min_rad;
+  int max_rad;
+  int max_dist;
+};
+
 class LiDAR_DATA {
 private:
   lidar_data_t data;
