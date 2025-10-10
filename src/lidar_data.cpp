@@ -1,6 +1,6 @@
 #include <lidar_obj.hpp>
 
-void to_json(nlohmann::json j, const metadata_t &t) {
+void to_json(nlohmann::json j, const lidar_metadata &t) {
   j = nlohmann::json{{"x", t.x},
                      {"y", t.y},
                      {"min_rad", t.min_rad},
@@ -8,7 +8,7 @@ void to_json(nlohmann::json j, const metadata_t &t) {
                      {"max_dist", t.max_dist}};
 }
 
-void from_json(const nlohmann::json &j, metadata_t &t) {
+void from_json(const nlohmann::json &j, lidar_metadata &t) {
   j.at("x").get_to(t.x);
   j.at("y").get_to(t.y);
   j.at("min_rad").get_to(t.min_rad);
@@ -16,32 +16,32 @@ void from_json(const nlohmann::json &j, metadata_t &t) {
   j.at("max_dist").get_to(t.max_dist);
 }
 
-void to_json(nlohmann::json &j, const lidar_data &p) {
+void to_json(nlohmann::json &j, const LiDARDataWrapper &p) {
   j = nlohmann::json{{"data", p.data}};
 }
 
-void from_json(const nlohmann::json &j, lidar_data &p) {
+void from_json(const nlohmann::json &j, LiDARDataWrapper &p) {
   j.at("data").get_to(p.data);
 }
 
-LiDAR_DATA_WRAPPER::LiDAR_DATA_WRAPPER(const std::vector<uint8_t> bin_data) {
+LiDARDataWrapper::LiDARDataWrapper(const std::vector<uint8_t> bin_data) {
   nlohmann::json::from_msgpack(bin_data).at("data").get_to(data);
 }
 
-void LiDAR_DATA_WRAPPER::insert(float degree, float value) {  //
+void LiDARDataWrapper::insert(float degree, float value) {  //
   data[degree] = value;
 }
 
-void LiDAR_DATA_WRAPPER::clear() {  //
+void LiDARDataWrapper::clear() {  //
   data.clear();
 }
 
-const sensor_data_t LiDAR_DATA_WRAPPER::get() {  //
+const LiDARData LiDARDataWrapper::get() {  //
   return data;
 }
 
-void LiDAR_DATA_WRAPPER::get(sensor_data_t &s) { s = data; }
+void LiDARDataWrapper::get(LiDARData &s) { s = data; }
 
-std::vector<uint8_t> LiDAR_DATA_WRAPPER::dump() {
+std::vector<uint8_t> LiDARDataWrapper::dump() {
   return nlohmann::json::to_msgpack(data);
 }

@@ -53,7 +53,7 @@ file(GLOB RPLIDAR_SDK_SRC
 
 file(GLOB LIDAR_TEST_SRC
   src/main.cpp
-  src/lidar_obj.cpp
+  src/lidar_data.cpp
   src/zenoh_wrapper.cpp
 )
 
