@@ -4,6 +4,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
 include_directories(include)
+include_directories(include/lidar_device)
 
 # GoolgeTest
 include(FetchContent)
@@ -26,6 +27,7 @@ foreach(test_src ${TEST_SOURCES})
 endforeach()
 
 target_include_directories(${test_name} PRIVATE include)
+target_include_directories(${test_name} PRIVATE include/lidar_device)
 
 # rplidar SDK include
 include_directories(3rdparty/rplidar_sdk/sdk/include)
@@ -55,6 +57,7 @@ file(GLOB LIDAR_TEST_SRC
   src/main.cpp
   src/lidar_data.cpp
   src/zenoh_wrapper.cpp
+  src/lidar_device/rplidar_wrapper.cpp
 )
 
 add_executable(hello ${LIDAR_TEST_SRC} ${RPLIDAR_SDK_SRC})
