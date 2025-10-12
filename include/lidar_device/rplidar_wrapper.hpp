@@ -7,15 +7,12 @@
 #include <memory>
 #include <random>
 
-#include "lidar_data.hpp"
 #include "mock_lidar.hpp"
 
 class RplidarWrapper : MockLiDAR {
  private:
-  std::unique_ptr<sl::IChannel> communication_channel;
-  std::unique_ptr<sl::Result<sl::IChannel *>> channel;
-  //    =    createSerialPortChannel(FLAGS_d, 115200);
-  std::unique_ptr<sl::ILidarDriver *> lidar;
+  std::unique_ptr<sl::IChannel> channel;
+  std::unique_ptr<sl::ILidarDriver> lidar;
   float max_dist;
 
  public:

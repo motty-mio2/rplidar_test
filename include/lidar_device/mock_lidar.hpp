@@ -1,6 +1,8 @@
 #ifndef MOCK_LIDAR_HPP
 #define MOCK_LIDAR_HPP
 
+#include "lidar_data.hpp"
+
 class MockLiDAR {
  private:
   int dummy_value;
