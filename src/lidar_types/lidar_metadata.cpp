@@ -1,4 +1,4 @@
-#include <lidar_data.hpp>
+#include "lidar_types/lidar_metadata.hpp"
 
 void to_json(nlohmann::json j, const LidarMetadata &t) {
   j = nlohmann::json{{"x", t.x},

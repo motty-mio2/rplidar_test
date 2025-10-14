@@ -8,9 +8,8 @@
 #include "arc_intersection.hpp"
 #include "degree2position.hpp"
 #include "flags.hpp"
-#include "lidar_data.hpp"
 #include "lidar_device/rplidar_wrapper.hpp"
-#include "visualizer.hpp"
+#include "lidar_types/lidar_data.hpp"
 #include "zenoh_wrapper.hpp"
 
 DECLARE_string(d);
@@ -31,12 +30,13 @@ int main(int argc, char *argv[]) {
   RplidarWrapper lidar(FLAGS_d, FLAGS_max_dist);
 
   auto data = LiDARDataWrapper();
+  auto z = ZenohWrapper();
 
   while (!ctrl_c_pressed) {
     data.clear();
 
     if (lidar.get(data)) {
-      visualize(data.get());
+      z.publish(data.dump());
     }
 
     return 0;

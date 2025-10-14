@@ -1,7 +1,7 @@
 #ifndef MOCK_LIDAR_HPP
 #define MOCK_LIDAR_HPP
 
-#include "lidar_data.hpp"
+#include "lidar_types/lidar_data.hpp"
 
 class MockLiDAR {
  private:

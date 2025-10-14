@@ -26,9 +26,6 @@ foreach(test_src ${TEST_SOURCES})
   add_test(NAME ${test_name} COMMAND ${test_name})
 endforeach()
 
-target_include_directories(${test_name} PRIVATE include)
-target_include_directories(${test_name} PRIVATE include/lidar_device)
-
 # rplidar SDK include
 include_directories(3rdparty/rplidar_sdk/sdk/include)
 include_directories(3rdparty/rplidar_sdk/sdk/src)
@@ -37,6 +34,7 @@ include_directories(3rdparty/rplidar_sdk/sdk/src/arch/linux)
 
 # Third party libraries
 find_package (gflags REQUIRED)
+find_package(nlohmann_json REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(zenohc REQUIRED)
 find_package(zenohcxx REQUIRED)
@@ -53,13 +51,29 @@ file(GLOB RPLIDAR_SDK_SRC
     3rdparty/rplidar_sdk/sdk/src/hal/thread.cpp
 )
 
+# My Libraries
+set (LIDAR_TYPES_FILES
+    src/lidar_types/lidar_data.cpp
+    src/lidar_types/lidar_metadata.cpp
+)
+
+add_library(LidarTypesLib ${LIDAR_TYPES_FILES})
+target_include_directories(LidarTypesLib PUBLIC include/lidar_types)
+target_link_libraries(LidarTypesLib nlohmann_json::nlohmann_json)
+
+set (LIDAR_DEVICE_FILES
+    src/lidar_device/rplidar_wrapper.cpp
+)
+
+add_library(LidarDeviceLib ${LIDAR_DEVICE_FILES} ${RPLIDAR_SDK_SRC})
+target_include_directories(LidarDeviceLib PUBLIC include/lidar_device)
+target_link_libraries(LidarDeviceLib nlohmann_json::nlohmann_json LidarTypesLib)
+
 file(GLOB LIDAR_TEST_SRC
-  src/main.cpp
-  src/lidar_data.cpp
   src/zenoh_wrapper.cpp
   src/lidar_device/rplidar_wrapper.cpp
 )
 
-add_executable(hello ${LIDAR_TEST_SRC} ${RPLIDAR_SDK_SRC})
-target_link_libraries(hello ${OpenCV_LIBS} pthread gflags zenohcxx::zenohc )
+add_executable(sender src/sender.cpp ${LIDAR_TEST_SRC})
+target_link_libraries(sender ${OpenCV_LIBS} pthread gflags zenohcxx::zenohc LidarDeviceLib)
 
