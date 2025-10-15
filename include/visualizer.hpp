@@ -16,7 +16,7 @@ DECLARE_double(max_dist);
 
 constexpr int IMG_SIZE = 600;
 
-void visualize(LiDARData data) {
+cv::Mat visualize(LiDARData data, std::string window_name) {
   float angle_step = 360.0f / FLAGS_num;
 
   std::vector<double> near;
@@ -44,11 +44,8 @@ void visualize(LiDARData data) {
                 angle_step * i, generate_color(i, FLAGS_num), 2);
   }
 
-  cv::imshow("Test Window", img);
-
-  if (cv::waitKey(1) == 'q') {
-    std::exit(0);
-  }
+  // cv::imshow(window_name, img);
+  return img;
 }
 
 #endif  // VISUALIZER_HPP_
