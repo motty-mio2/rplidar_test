@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <random>
+#include <thread>
 
 #include "mock_lidar.hpp"
 
@@ -14,7 +15,7 @@ class RandomLiDAR : MockLiDAR {
   std::unique_ptr<std::uniform_real_distribution<float>> random_skip;
 
  public:
-  RandomLiDAR() {
+  inline RandomLiDAR() {
     random_engine = std::make_unique<std::mt19937>(std::random_device{}());
     random_distance =
         std::make_unique<std::uniform_int_distribution<int>>(10, 1000);
@@ -24,7 +25,20 @@ class RandomLiDAR : MockLiDAR {
         std::make_unique<std::uniform_real_distribution<float>>(0.8, 1.2);
   };
 
-  ~RandomLiDAR();
+  inline bool get(LiDARDataWrapper &data) override {
+    float rate = (*random_rate)(*random_engine);
+    for (int degree = 0; degree < 360; degree++) {
+      if ((*random_skip)(*random_engine) > rate) {
+        continue;
+      }
+      int dist = (*random_distance)(*random_engine);
+      data.insert(degree, dist);
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    return true;
+  }
+
+  inline ~RandomLiDAR() {};
 };
 
 #endif  // RANDOM_LIDAR_HPP

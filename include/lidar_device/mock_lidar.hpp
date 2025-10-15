@@ -4,9 +4,6 @@
 #include "lidar_types/lidar_data.hpp"
 
 class MockLiDAR {
- private:
-  int dummy_value;
-
  public:
   virtual bool get(LiDARDataWrapper &data) = 0;
 };
