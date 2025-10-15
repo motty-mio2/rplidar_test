@@ -8,6 +8,7 @@ include_directories(include/lidar_device)
 
 # GoolgeTest
 include(FetchContent)
+cmake_policy(SET CMP0135 NEW)
 FetchContent_Declare(
   googletest
   URL https://github.com/google/googletest/archive/refs/heads/main.zip
