@@ -9,7 +9,7 @@
 
 #include "mock_lidar.hpp"
 
-class RplidarWrapper : MockLiDAR {
+class RplidarWrapper : public MockLiDAR {
  private:
   std::unique_ptr<sl::IChannel> channel;
   std::unique_ptr<sl::ILidarDriver> lidar;

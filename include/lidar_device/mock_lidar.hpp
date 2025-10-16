@@ -6,6 +6,7 @@
 class MockLiDAR {
  public:
   virtual bool get(LiDARDataWrapper &data) = 0;
+  virtual ~MockLiDAR() = default;
 };
 
 #endif  // MOCK_LIDAR_HPP
