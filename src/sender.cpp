@@ -4,17 +4,18 @@
 
 #include <iostream>
 #include <limits>
+#include <memory>
 #include <string>
 #include <thread>
 
-#include "flags.hpp"
 #include "lidar_device/random_lidar.hpp"
 #include "lidar_device/rplidar_wrapper.hpp"
 #include "lidar_types/lidar_data.hpp"
 #include "zenoh.hxx"
 
-DECLARE_string(d);
-DECLARE_double(max_dist);
+DEFINE_string(d, "/dev/ttyUSB0", "path/to/device");
+DEFINE_double(m, 1000, "maximum distance in mm");
+DEFINE_string(b, "random", "lidar backend (rplidar or random)");
 
 volatile sig_atomic_t ctrl_c_pressed = 0;
 
@@ -38,16 +39,23 @@ int main(int argc, char *argv[]) {
   auto metadata_publisher =
       session.declare_publisher(zenoh::KeyExpr("lidar/metadata"));
 
-  // Lidar Setup
-  // RplidarWrapper lidar(FLAGS_d, FLAGS_max_dist);
-  RandomLiDAR lidar;
+  std::unique_ptr<MockLiDAR> lidar;
+
+  if (FLAGS_b == "rplidar") {
+    lidar = std::make_unique<RplidarWrapper>(FLAGS_d, FLAGS_m);
+  } else if (FLAGS_b == "random") {
+    lidar = std::make_unique<RandomLiDAR>(FLAGS_m);
+  } else {
+    std::cerr << "Invalid backend: " << FLAGS_b << std::endl;
+    return 1;
+  }
 
   auto data = LiDARDataWrapper();
 
   while (!ctrl_c_pressed) {
     data.clear();
 
-    if (lidar.get(data)) {
+    if (lidar && lidar->get(data)) {
       publisher.put(data.dump());
     }
   }

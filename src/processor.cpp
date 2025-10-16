@@ -1,3 +1,5 @@
+#include <gflags/gflags.h>
+
 #include <chrono>
 #include <cstdint>
 #include <iostream>
@@ -5,9 +7,11 @@
 #include <opencv2/opencv.hpp>
 #include <thread>
 
-#include "flags.hpp"
 #include "visualizer.hpp"
 #include "zenoh.hxx"
+
+DEFINE_uint32(num, 4, "number of areas");
+DEFINE_double(max_dist, 1000, "maximum distance in mm");
 
 std::chrono::system_clock::time_point ntp64_to_timepoint(uint64_t ntp64) {
   uint32_t seconds = (ntp64 >> 32);  // NTPエポックからの秒数
@@ -20,10 +24,13 @@ std::chrono::system_clock::time_point ntp64_to_timepoint(uint64_t ntp64) {
                                                std::chrono::nanoseconds(nanos)};
 }
 
-int main() {
+int main(int argc, char **argv) {
+  gflags::ParseCommandLineFlags(&argc, &argv, true);
+
   std::map<std::string,
            std::pair<std::chrono::system_clock::time_point, cv::Mat>>
       timestamps;
+  std::map<std::string, LidarMetadata> metadata_map;
 
   bool updated = false;
 
@@ -41,7 +48,8 @@ int main() {
         auto data = sample.get_payload().as_vector();
         auto z = LiDARDataWrapper(data);
 
-        timestamps[id] = {timestamp, visualize(z.get(), id)};
+        timestamps[id] = {timestamp,
+                          visualize(z.get(), id, FLAGS_num, FLAGS_max_dist)};
 
         updated = true;
       },
@@ -67,6 +75,7 @@ int main() {
       if (now - it->second.first > std::chrono::seconds(5)) {
         cv::destroyWindow(it->first);
         it = timestamps.erase(it);
+        metadata_map.erase(it->first);
       } else {
         ++it;
       }
