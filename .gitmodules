@@ -1,3 +1,6 @@
 [submodule "3rdparty/rplidar_sdk"]
 	path = 3rdparty/rplidar_sdk
 	url = https://github.com/Slamtec/rplidar_sdk.git
+[submodule "3rdparty/toml11"]
+	path = 3rdparty/toml11
+	url = https://github.com/ToruNiina/toml11.git

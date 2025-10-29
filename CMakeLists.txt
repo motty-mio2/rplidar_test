@@ -34,7 +34,8 @@ include_directories(3rdparty/rplidar_sdk/sdk/src/hal)
 include_directories(3rdparty/rplidar_sdk/sdk/src/arch/linux)
 
 # Third party libraries
-find_package (gflags REQUIRED)
+add_subdirectory(3rdparty/toml11)
+find_package(gflags REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(OpenCV REQUIRED)
 find_package(zenohc REQUIRED)
