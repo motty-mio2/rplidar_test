@@ -1,7 +1,8 @@
 #include "rplidar_wrapper.hpp"
 
-RplidarWrapper::RplidarWrapper(std::string device, float max_distance)
-    : max_distance(max_distance) {
+RplidarWrapper::RplidarWrapper(std::string device, float max_distance,
+                               int min_degree, int max_degree)
+    : MockLiDAR(max_distance, min_degree, max_degree) {
   auto channel_result = sl::createSerialPortChannel(device, 115200);
   channel = std::unique_ptr<sl::IChannel>(channel_result.value);
   lidar = std::unique_ptr<sl::ILidarDriver>(sl::createLidarDriver().value);
@@ -31,9 +32,15 @@ bool RplidarWrapper::get(LiDARDataWrapper &data) {
       continue;
     }
     float degree = (nodes[pos].angle_z_q14 * 90.f) / 16384.f;
-    float dist = std::min(max_distance, nodes[pos].dist_mm_q2 / 4.0f);
 
-    data.insert(degree, dist);
+    if (((min_degree <= max_degree) &&
+         (min_degree <= degree && degree < max_degree)) ||
+        (min_degree > max_degree &&
+         ((min_degree <= degree) || (degree < max_degree)))) {
+      float dist = std::min(max_distance, nodes[pos].dist_mm_q2 / 4.0f);
+
+      data.insert(degree, dist);
+    }
   }
 
   return true;

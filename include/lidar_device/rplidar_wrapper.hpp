@@ -13,10 +13,11 @@ class RplidarWrapper : public MockLiDAR {
  private:
   std::unique_ptr<sl::IChannel> channel;
   std::unique_ptr<sl::ILidarDriver> lidar;
-  float max_distance;
 
  public:
-  RplidarWrapper(std::string device, float max_distance);
+  RplidarWrapper(std::string device, float max_distance = 1000.0,
+                 int min_degree = 0, int max_degree = 360);
+  // : MockLiDAR(max_distance, min_degree, max_degree);
   bool get(LiDARDataWrapper &data);
   ~RplidarWrapper();
 };

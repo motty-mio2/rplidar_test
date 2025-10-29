@@ -9,15 +9,15 @@
 
 class RandomLiDAR : public MockLiDAR {
  private:
-  double max_distance = 1000.0;
   std::unique_ptr<std::mt19937> random_engine;
   std::unique_ptr<std::uniform_int_distribution<int>> random_distance;
   std::unique_ptr<std::uniform_real_distribution<float>> random_rate;
   std::unique_ptr<std::uniform_real_distribution<float>> random_skip;
 
  public:
-  inline RandomLiDAR(double max_distance = 1000.0)
-      : max_distance(max_distance) {
+  inline RandomLiDAR(float max_distance = 1000.0, int min_degree = 0,
+                     int max_degree = 360)
+      : MockLiDAR(max_distance, min_degree, max_degree) {
     random_engine = std::make_unique<std::mt19937>(std::random_device{}());
     random_distance = std::make_unique<std::uniform_int_distribution<int>>(
         max_distance / 10.0f, max_distance);
@@ -29,13 +29,32 @@ class RandomLiDAR : public MockLiDAR {
 
   inline bool get(LiDARDataWrapper &data) override {
     float rate = (*random_rate)(*random_engine);
-    for (int degree = 0; degree < 360; degree++) {
-      if ((*random_skip)(*random_engine) > rate) {
-        continue;
+
+    if (min_degree <= max_degree) {
+      for (int degree = min_degree; degree < max_degree; degree++) {
+        if ((*random_skip)(*random_engine) > rate) {
+          continue;
+        }
+        int dist = (*random_distance)(*random_engine);
+        data.insert(degree, dist);
       }
-      int dist = (*random_distance)(*random_engine);
-      data.insert(degree, dist);
+    } else {
+      for (int degree = min_degree; degree < 360; degree++) {
+        if ((*random_skip)(*random_engine) > rate) {
+          continue;
+        }
+        int dist = (*random_distance)(*random_engine);
+        data.insert(degree, dist);
+      }
+      for (int degree = 0; degree < max_degree; degree++) {
+        if ((*random_skip)(*random_engine) > rate) {
+          continue;
+        }
+        int dist = (*random_distance)(*random_engine);
+        data.insert(degree, dist);
+      }
     }
+
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     return true;
   }
