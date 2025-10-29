@@ -7,11 +7,13 @@
 #include <opencv2/opencv.hpp>
 #include <thread>
 
+#include "config.hpp"
+#include "lidar_metadata.hpp"
 #include "visualizer.hpp"
 #include "zenoh.hxx"
 
-DEFINE_uint32(num, 4, "number of areas");
-DEFINE_double(max_dist, 1000, "maximum distance in mm");
+DEFINE_string(
+    c, "", "config file path: Default `$XDG_CONFIG_DIR/roboapp/config.toml`");
 
 std::chrono::system_clock::time_point ntp64_to_timepoint(uint64_t ntp64) {
   uint32_t seconds = (ntp64 >> 32);  // NTPエポックからの秒数
@@ -25,6 +27,10 @@ std::chrono::system_clock::time_point ntp64_to_timepoint(uint64_t ntp64) {
 }
 
 int main(int argc, char **argv) {
+  // Flag Setup
+  gflags::SetUsageMessage("How To Use");
+  gflags::SetVersionString("1.0.0");
+
   gflags::ParseCommandLineFlags(&argc, &argv, true);
 
   std::map<std::string,
@@ -32,24 +38,29 @@ int main(int argc, char **argv) {
       timestamps;
   std::map<std::string, LidarMetadata> metadata_map;
 
+  auto config = get_params_config();
+
   bool updated = false;
 
   // Zenoh Setup
-  auto config = zenoh::Config::create_default();
-  config.insert_json5(Z_CONFIG_ADD_TIMESTAMP_KEY, "true");
+  auto zenoh_config = zenoh::Config::create_default();
+  zenoh_config.insert_json5(Z_CONFIG_ADD_TIMESTAMP_KEY, "true");
 
-  auto session = zenoh::Session(std::move(config));
+  auto session = zenoh::Session(std::move(zenoh_config));
   session.declare_background_subscriber(  //
       zenoh::KeyExpr("lidar/data"),       //
-      [&timestamps, &updated](const zenoh::Sample &sample) {
+      [&timestamps, &updated, &config](const zenoh::Sample &sample) {
         auto timestamp = ntp64_to_timepoint(sample.get_timestamp()->get_time());
 
         auto id = sample.get_timestamp()->get_id().to_string();
         auto data = sample.get_payload().as_vector();
         auto z = LiDARDataWrapper(data);
 
-        timestamps[id] = {timestamp,
-                          visualize(z.get(), id, FLAGS_num, FLAGS_max_dist)};
+        timestamps[id] = {
+            timestamp,
+            visualize(z.get(), id, toml::find_or(config, "number", 4),
+                      toml::find_or(config, "image_size", 600),
+                      toml::find_or(config, "max_distance", 1000.0))};
 
         updated = true;
       },

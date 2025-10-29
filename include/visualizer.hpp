@@ -8,19 +8,17 @@
 #include "generate_color.hpp"
 #include "lidar_types/lidar_data.hpp"
 
-constexpr int IMG_SIZE = 600;
-
 cv::Mat visualize(LiDARData data, std::string window_name, uint32_t num = 4,
-                  double max_distance = 1000.0) {
+                  uint32_t image_size = 600, float max_distance = 1000.0) {
   float angle_step = 360.0f / num;
 
-  std::vector<double> near;
+  std::vector<float> near;
 
   for (auto i = 0; i < num; ++i) {
-    near.push_back(IMG_SIZE / 2.0f);
+    near.push_back(image_size / 2.0f);
   }
 
-  cv::Mat img = cv::Mat::zeros(IMG_SIZE, IMG_SIZE, CV_8UC3);
+  cv::Mat img = cv::Mat::zeros(image_size, image_size, CV_8UC3);
 
   for (auto &[degree, distance] : data) {
     if (distance == 0.0f || distance > max_distance) {
@@ -30,16 +28,15 @@ cv::Mat visualize(LiDARData data, std::string window_name, uint32_t num = 4,
     int index = static_cast<int>(degree / angle_step);
 
     near[index] =
-        std::min(near[index], distance * (IMG_SIZE / 2.0f) / max_distance);
+        std::min(near[index], distance * (image_size / 2.0f) / max_distance);
   }
 
   for (auto i = 0; i < num; ++i) {
-    cv::ellipse(img, cv::Point2d(IMG_SIZE / 2, IMG_SIZE / 2),
+    cv::ellipse(img, cv::Point2d(image_size / 2, image_size / 2),
                 cv::Size(near[i], near[i]), angle_step, angle_step * (i - 1),
                 angle_step * i, generate_color(i, num), 2);
   }
 
-  // cv::imshow(window_name, img);
   return img;
 }
 
