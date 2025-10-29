@@ -69,11 +69,11 @@ set (LIDAR_DEVICE_FILES
 
 add_library(LidarDeviceLib ${LIDAR_DEVICE_FILES} ${RPLIDAR_SDK_SRC})
 target_include_directories(LidarDeviceLib PUBLIC include/lidar_device)
-target_link_libraries(LidarDeviceLib nlohmann_json::nlohmann_json LidarTypesLib)
+target_link_libraries(LidarDeviceLib nlohmann_json::nlohmann_json LidarTypesLib zenohcxx::zenohc)
 
 add_executable(sender src/sender.cpp)
-target_link_libraries(sender gflags zenohcxx::zenohc)
-target_link_libraries(sender LidarDeviceLib )
+target_link_libraries(sender gflags toml11::toml11 zenohcxx::zenohc)
+target_link_libraries(sender LidarDeviceLib)
 
 add_executable(processor src/processor.cpp )
 target_link_libraries(processor gflags ${OpenCV_LIBS} pthread zenohcxx::zenohc)

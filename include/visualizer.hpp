@@ -11,7 +11,7 @@
 constexpr int IMG_SIZE = 600;
 
 cv::Mat visualize(LiDARData data, std::string window_name, uint32_t num = 4,
-                  double max_dist = 1000.0) {
+                  double max_distance = 1000.0) {
   float angle_step = 360.0f / num;
 
   std::vector<double> near;
@@ -23,14 +23,14 @@ cv::Mat visualize(LiDARData data, std::string window_name, uint32_t num = 4,
   cv::Mat img = cv::Mat::zeros(IMG_SIZE, IMG_SIZE, CV_8UC3);
 
   for (auto &[degree, distance] : data) {
-    if (distance == 0.0f || distance > max_dist) {
+    if (distance == 0.0f || distance > max_distance) {
       continue;
     }
 
     int index = static_cast<int>(degree / angle_step);
 
     near[index] =
-        std::min(near[index], distance * (IMG_SIZE / 2.0f) / max_dist);
+        std::min(near[index], distance * (IMG_SIZE / 2.0f) / max_distance);
   }
 
   for (auto i = 0; i < num; ++i) {

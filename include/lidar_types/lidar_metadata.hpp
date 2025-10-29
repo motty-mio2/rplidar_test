@@ -12,11 +12,18 @@ class LidarMetadata {
  public:
   int x;
   int y;
-  int min_rad;
-  int max_rad;
-  int max_dist;
+  int min_degree;
+  int max_degree;
+  int max_distance;
 
   LidarMetadata(const std::vector<uint8_t> bin_data);
+  LidarMetadata(int x = 0, int y = 0, int min_degree = 0, int max_degree = 360,
+                int max_distance = 1000)
+      : x(x),
+        y(y),
+        min_degree(min_degree),
+        max_degree(max_degree),
+        max_distance(max_distance) {};
   std::vector<uint8_t> dump();
 };
 

@@ -3,17 +3,17 @@
 void to_json(nlohmann::json j, const LidarMetadata &t) {
   j = nlohmann::json{{"x", t.x},
                      {"y", t.y},
-                     {"min_rad", t.min_rad},
-                     {"max_rad", t.max_rad},
-                     {"max_dist", t.max_dist}};
+                     {"min_degree", t.min_degree},
+                     {"max_degree", t.max_degree},
+                     {"max_distance", t.max_distance}};
 }
 
 void from_json(const nlohmann::json &j, LidarMetadata &t) {
   j.at("x").get_to(t.x);
   j.at("y").get_to(t.y);
-  j.at("min_rad").get_to(t.min_rad);
-  j.at("max_rad").get_to(t.max_rad);
-  j.at("max_dist").get_to(t.max_dist);
+  j.at("min_degree").get_to(t.min_degree);
+  j.at("max_degree").get_to(t.max_degree);
+  j.at("max_distance").get_to(t.max_distance);
 }
 
 std::vector<uint8_t> LidarMetadata::dump() {

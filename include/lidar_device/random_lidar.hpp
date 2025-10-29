@@ -9,17 +9,18 @@
 
 class RandomLiDAR : public MockLiDAR {
  private:
-  double max_dist = 1000.0;
+  double max_distance = 1000.0;
   std::unique_ptr<std::mt19937> random_engine;
   std::unique_ptr<std::uniform_int_distribution<int>> random_distance;
   std::unique_ptr<std::uniform_real_distribution<float>> random_rate;
   std::unique_ptr<std::uniform_real_distribution<float>> random_skip;
 
  public:
-  inline RandomLiDAR(double max_dist = 1000.0) : max_dist(max_dist) {
+  inline RandomLiDAR(double max_distance = 1000.0)
+      : max_distance(max_distance) {
     random_engine = std::make_unique<std::mt19937>(std::random_device{}());
     random_distance = std::make_unique<std::uniform_int_distribution<int>>(
-        max_dist / 10.0f, max_dist);
+        max_distance / 10.0f, max_distance);
     random_skip =
         std::make_unique<std::uniform_real_distribution<float>>(0.0, 1.0);
     random_rate =
