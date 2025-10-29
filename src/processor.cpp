@@ -58,7 +58,7 @@ int main(int argc, char **argv) {
 
         timestamps[id] = {
             timestamp,
-            visualize(z.get(), id, toml::find_or(config, "number", 4),
+            visualize(z.get(), id, z.x, z.y, toml::find_or(config, "number", 4),
                       toml::find_or(config, "image_size", 600),
                       toml::find_or(config, "max_distance", 1000.0))};
 
@@ -67,19 +67,6 @@ int main(int argc, char **argv) {
       zenoh::closures::none);
 
   while (true) {
-    if (updated) {
-      for (auto &[id, pair] : timestamps) {
-        auto &[timestamp, img] = pair;
-        cv::imshow(id, img);
-      }
-
-      cv::waitKey(1);
-
-      updated = false;
-      continue;
-    }
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
     auto now = std::chrono::system_clock::now();
 
     for (auto it = timestamps.begin(); it != timestamps.end();) {
@@ -91,6 +78,18 @@ int main(int argc, char **argv) {
         ++it;
       }
     }
+
+    if (updated) {
+      for (auto &[id, pair] : timestamps) {
+        auto &[timestamp, data] = pair;
+        cv::imshow(id, data);
+        cv::waitKey(1);
+      }
+
+      updated = false;
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
   return 0;

@@ -14,7 +14,10 @@ class LiDARDataWrapper {
  private:
  public:
   LiDARData data;
-  LiDARDataWrapper() {};
+  int x;
+  int y;
+
+  LiDARDataWrapper(int x = 0, int y = 0) : x(x), y(y) {};
   LiDARDataWrapper(const LiDARData &new_data) : data(new_data) {};
   LiDARDataWrapper(const std::vector<uint8_t> bin_data);
 

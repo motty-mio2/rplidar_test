@@ -62,7 +62,8 @@ int main(int argc, char* argv[]) {
   auto session = zenoh::Session(std::move(config));
   auto publisher = session.declare_publisher(zenoh::KeyExpr("lidar/data"));
 
-  auto data = LiDARDataWrapper();
+  auto data = LiDARDataWrapper(toml::find_or(lidar_config, "x", 0),
+                               toml::find_or(lidar_config, "y", 0));
 
   while (!ctrl_c_pressed) {
     data.clear();

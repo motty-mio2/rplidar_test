@@ -8,8 +8,9 @@
 #include "generate_color.hpp"
 #include "lidar_types/lidar_data.hpp"
 
-cv::Mat visualize(LiDARData data, std::string window_name, uint32_t num = 4,
-                  uint32_t image_size = 600, float max_distance = 1000.0) {
+cv::Mat visualize(LiDARData data, std::string window_name, uint32_t x = 0,
+                  uint32_t y = 0, uint32_t num = 4, uint32_t image_size = 600,
+                  float max_distance = 1000.0) {
   float angle_step = 360.0f / num;
 
   float max_visual_distance = image_size / 2.0f;
@@ -37,7 +38,7 @@ cv::Mat visualize(LiDARData data, std::string window_name, uint32_t num = 4,
     if (near[i] >= (max_visual_distance)) {
       continue;
     }
-    cv::ellipse(img, cv::Point2d(image_size / 2, image_size / 2),
+    cv::ellipse(img, cv::Point2d(image_size / 2 + x, image_size / 2 + y),
                 cv::Size(near[i], near[i]), angle_step, angle_step * (i - 1),
                 angle_step * i, generate_color(i, num), 2);
   }
