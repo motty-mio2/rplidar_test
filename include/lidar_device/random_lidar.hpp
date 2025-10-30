@@ -20,37 +20,26 @@ class RandomLiDAR : public MockLiDAR {
       : MockLiDAR(max_distance, min_degree, max_degree) {
     random_engine = std::make_unique<std::mt19937>(std::random_device{}());
     random_distance = std::make_unique<std::uniform_int_distribution<int>>(
-        max_distance / 10.0f, max_distance);
-    random_skip =
-        std::make_unique<std::uniform_real_distribution<float>>(0.0, 1.0);
+        max_distance * 0.01, max_distance * 0.2);
     random_rate =
         std::make_unique<std::uniform_real_distribution<float>>(0.8, 1.2);
   };
 
   inline bool get(LiDARDataWrapper &data) override {
-    float rate = (*random_rate)(*random_engine);
+    auto base = (*random_distance)(*random_engine);
 
     if (min_degree <= max_degree) {
       for (int degree = min_degree; degree < max_degree; degree++) {
-        if ((*random_skip)(*random_engine) > rate) {
-          continue;
-        }
-        int dist = (*random_distance)(*random_engine);
+        int dist = base * (*random_rate)(*random_engine);
         data.insert(degree, dist);
       }
     } else {
       for (int degree = min_degree; degree < 360; degree++) {
-        if ((*random_skip)(*random_engine) > rate) {
-          continue;
-        }
-        int dist = (*random_distance)(*random_engine);
+        int dist = base * (*random_rate)(*random_engine);
         data.insert(degree, dist);
       }
       for (int degree = 0; degree < max_degree; degree++) {
-        if ((*random_skip)(*random_engine) > rate) {
-          continue;
-        }
-        int dist = (*random_distance)(*random_engine);
+        int dist = base * (*random_rate)(*random_engine);
         data.insert(degree, dist);
       }
     }
