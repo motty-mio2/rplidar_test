@@ -8,6 +8,7 @@
 #include <thread>
 
 #include "config.hpp"
+#include "degree2position.hpp"
 #include "lidar_metadata.hpp"
 #include "visualizer.hpp"
 #include "zenoh.hxx"
@@ -33,8 +34,8 @@ int main(int argc, char **argv) {
 
   gflags::ParseCommandLineFlags(&argc, &argv, true);
 
-  std::map<std::string,
-           std::pair<std::chrono::system_clock::time_point, cv::Mat>>
+  std::map<std::string, std::tuple<std::chrono::system_clock::time_point,
+                                   cv::Mat, LiDARDataWrapper>>
       timestamps;
   std::map<std::string, LidarMetadata> metadata_map;
 
@@ -60,7 +61,9 @@ int main(int argc, char **argv) {
             timestamp,
             singleVisualize(z.get(), id, toml::find_or(config, "number", 4),
                             toml::find_or(config, "image_size", 600),
-                            toml::find_or(config, "max_distance", 1000.0))};
+                            toml::find_or(config, "max_distance", 1000.0)),
+            z,
+        };
 
         updated = true;
       },
@@ -70,7 +73,7 @@ int main(int argc, char **argv) {
     auto now = std::chrono::system_clock::now();
 
     for (auto it = timestamps.begin(); it != timestamps.end();) {
-      if (now - it->second.first > std::chrono::seconds(5)) {
+      if (now - std::get<0>(it->second) > std::chrono::seconds(5)) {
         cv::destroyWindow(it->first);
         it = timestamps.erase(it);
         metadata_map.erase(it->first);
@@ -80,14 +83,20 @@ int main(int argc, char **argv) {
     }
 
     if (updated) {
+      std::vector<cv::Point2f> data;
       for (auto &[id, pair] : timestamps) {
-        auto &[timestamp, data] = pair;
-        cv::imshow(id, data);
-        cv::waitKey(1);
+        auto &[timestamp, img, lidar_data] = pair;
+        for (auto &z : lidar_data.get()) {
+          data.push_back(
+              degree2position(lidar_data.x, lidar_data.y, z.first, z.second));
+        }
+        cv::imshow(id, img);
       }
-
-      updated = false;
+      cv::imshow("multiple", multipleVisualize(data, 600));
+      cv::waitKey(1);
     }
+
+    updated = false;
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
