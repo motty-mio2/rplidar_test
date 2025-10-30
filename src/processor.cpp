@@ -58,9 +58,9 @@ int main(int argc, char **argv) {
 
         timestamps[id] = {
             timestamp,
-            visualize(z.get(), id, z.x, z.y, toml::find_or(config, "number", 4),
-                      toml::find_or(config, "image_size", 600),
-                      toml::find_or(config, "max_distance", 1000.0))};
+            singleVisualize(z.get(), id, toml::find_or(config, "number", 4),
+                            toml::find_or(config, "image_size", 600),
+                            toml::find_or(config, "max_distance", 1000.0))};
 
         updated = true;
       },
