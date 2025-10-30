@@ -39,10 +39,20 @@ cv::Mat singleVisualize(const LiDARDataWrapper &data,
     if (near[i] >= (max_visual_distance)) {
       continue;
     }
-    cv::ellipse(img,
-                cv::Point2d(image_size / 2 + data.x, image_size / 2 + data.y),
+    cv::ellipse(img, cv::Point2d(image_size / 2, image_size / 2),
                 cv::Size(near[i], near[i]), angle_step, angle_step * (i - 1),
                 angle_step * i, generate_color(i, num), 2);
+  }
+
+  return img;
+}
+
+cv::Mat multipleVisualize(const std::vector<cv::Point2f> &data,
+                          const uint32_t image_size = 600) {
+  cv::Mat img = cv::Mat::zeros(image_size, image_size, CV_8UC3);
+  for (const auto p : data) {
+    cv::circle(img, cv::Point2d(p.x + image_size / 2, p.y + image_size / 2), 2,
+               cv::Scalar(255, 255, 255), -1);
   }
 
   return img;
